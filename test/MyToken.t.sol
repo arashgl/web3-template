@@ -8,26 +8,39 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract MyTokenTest is Test {
     MyToken public myToken = new MyToken("RToken", "RTK");
-    address private testAddress = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-    function testTransferFund() public {
+    address private testAddress = address(1);
+    address private testAddress2 = address(2);
+
+    function testShouldTransferFund() public {
         myToken.transfer(msg.sender, 1e18);
         assertEq(myToken.balanceOf(msg.sender), 1e18);
     }
 
-    function testApprove() public {
+    function testShouldApprove() public {
         myToken.approve(testAddress, 1e20);
-        console.log(
-            "%s:%s",
-            "allowance",
-            myToken.allowance(address(this), testAddress)
-        );
         assertEq(myToken.allowance(address(this), testAddress), 1e20);
     }
 
-    function testTransferFrom() public {
+    function testShouldTransferFrom() public {
         myToken.approve(address(this), 1e19);
-        console.log("%s", myToken.allowance(address(this), msg.sender));
         myToken.transferFrom(address(this), testAddress, 1e19);
         assertEq(myToken.balanceOf(testAddress), 1e19);
+    }
+
+    function testShouldTransferBetweenTwoAccount() public {
+        vm.startPrank(address(this));
+        myToken.transfer(testAddress, 1e18);
+        vm.stopPrank();
+
+        vm.startPrank(testAddress);
+        myToken.transfer(testAddress2, 1e18);
+        vm.stopPrank();
+
+        assertEq(myToken.balanceOf(testAddress2), 1e18);
+    }
+
+    function testShouldRevert() public {
+        vm.expectRevert();
+        myToken.transferFrom(testAddress, address(this), 1e18);
     }
 }

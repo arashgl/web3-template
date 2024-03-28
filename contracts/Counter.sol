@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
-
 import "hardhat/console.sol";
 
 contract Counter {
     event NewEvent(uint256 amount);
-
     error CountIsZero();
-
     uint256 public count = 0;
- 
+
     address public owner;
 
     constructor() {
